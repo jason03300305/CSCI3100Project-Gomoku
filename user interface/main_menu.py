@@ -1,9 +1,19 @@
 import pygame
+import subprocess
+import sys
 
 
+if len(sys.argv) > 1:
+    data = sys.argv[1]
+    username = data
+else:
+    username = None
+print(username)
 
+# Button class for creating buttons on the game interface
 class Button:
     def __init__(self, screen, pos, text, font, base_color, hov_color):
+        # Initialize button attributes
         self.x_pos = pos[0]
         self.y_pos = pos[1]
         self.font = font
@@ -14,17 +24,18 @@ class Button:
         self.text_rect = self.rect
         self.draw(screen)
     
+    # Draw the button on the screen
     def draw(self, screen):
         screen.blit(self.text, self.text_rect)
 
+    # Check if the mouse position is within the button's bounds
     def checkMousePos(self, pos):
-        # Check if the given position is within the button's bounds
         if self.rect.left <= pos[0] <= self.rect.right and self.rect.bottom >= pos[1] >= self.rect.top:
             return True
         return False
         
+    # Change the button's text color when hovering over it      
     def changeColor(self, pos):
-        # Change the button's text color if hovering on the button
         if self.rect.left <= pos[0] <= self.rect.right and self.rect.bottom >= pos[1] >= self.rect.top:
             self.text = self.font.render(self.text_input, True, self.hov_color)
         else:
@@ -35,6 +46,7 @@ pygame.init()  # Initialize Pygame
 screen = pygame.display.set_mode((1280, 720))  # Set up the screen
 pygame.display.set_caption("Main Menu")  # Set the window caption
 
+# Load the font files
 menu_font = pygame.font.Font('Cartoon.ttf', 100)
 default_font = pygame.font.Font('Cartoon.ttf', 50)
 default_font2 = pygame.font.Font('Cartoon.ttf', 40)
@@ -72,31 +84,41 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check which button is clicked and perform corresponding actions
             if btn_play_ai.checkMousePos(mouse_pos):
-                
+                # Handle PLAY with AI (local) button click
                 print(f"{btn_play_ai.text_input} is pressed.")
-                ### ****************** play_with_ai_function ******************
+                subprocess.run([sys.executable, "game_engine_PvE.py", username])
+
+
 
             if btn_play_human.checkMousePos(mouse_pos):
+                # Handle PLAY with HUMAN (local) button click
                 print(f"{btn_play_human.text_input} is pressed.")
-                ### ******************* play_with_human_local_function ******************
+                subprocess.run([sys.executable, "room_system.py", username])
+
 
             if btn_play_human_match.checkMousePos(mouse_pos):
+                # Handle PLAY with HUMAN (matching) button click
                 print(f"{btn_play_human_match.text_input} is pressed.")
-                ### ******************* play_with_human_match_function ******************
+                subprocess.run([sys.executable, "game_engine_PvP.py", username])
 
             if btn_user.checkMousePos(mouse_pos):
+                # Handle MY PROFILE button click
                 print(f"{btn_user.text_input} is pressed.")
-                ### ******************* user_profile_function ******************
+                subprocess.run([sys.executable, "User_profile.py", username])
+
 
             if btn_ranking.checkMousePos(mouse_pos):
+                # Handle RANKING button click
                 print(f"{btn_ranking.text_input} is pressed.")
-                ### ******************* ranking_function ******************
+                subprocess.run([sys.executable, "ranking.py", username])
 
             if btn_logout.checkMousePos(mouse_pos):
+                # Handle LOG OUT button click
                 print(f"{btn_logout.text_input} is pressed.")
-                ### ******************* log_out_function ******************
+                pygame.quit()
 
             if btn_quit.checkMousePos(mouse_pos):
+                # Handle QUIT button click
                 print(f"{btn_quit.text_input} is pressed.")
                 pygame.quit()
 
