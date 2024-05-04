@@ -1,6 +1,6 @@
 import pygame
-
-
+import subprocess
+import sys
 
 class Button:
     def __init__(self, screen, pos, text, font, base_color, hov_color):
@@ -13,7 +13,7 @@ class Button:
         self.rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.rect
         self.draw(screen)
-    
+
     def draw(self, screen):
         screen.blit(self.text, self.text_rect)
 
@@ -22,7 +22,7 @@ class Button:
         if self.rect.left <= pos[0] <= self.rect.right and self.rect.bottom >= pos[1] >= self.rect.top:
             return True
         return False
-        
+
     def changeColor(self, pos):
         # Change the button's text color if hovering on the button
         if self.rect.left <= pos[0] <= self.rect.right and self.rect.bottom >= pos[1] >= self.rect.top:
@@ -30,17 +30,18 @@ class Button:
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
 
+
 pygame.init()  # Initialize Pygame
 
 screen = pygame.display.set_mode((1280, 720))  # Set up the screen
 pygame.display.set_caption("Main Menu (Admin)")  # Set the window caption
 
-#**********************************    Text Size and font   *******************************************
+# **********************************    Text Size and font   *******************************************
 menu_font = pygame.font.Font('Cartoon.ttf', 100)
 default_font = pygame.font.Font('Cartoon.ttf', 50)
 default_font2 = pygame.font.Font('Cartoon.ttf', 40)
 
-#**********************************    Main   *******************************************
+# **********************************    Main   *******************************************
 while True:
     screen.fill('black')  # Clear the screen with black color
     mouse_pos = pygame.mouse.get_pos()
@@ -50,17 +51,20 @@ while True:
     screen.blit(menu_text, menu_rect)  # Draw the menu text on the screen
 
     menu_text = default_font2.render("ADMIN", True, "white")  # Render the menu text
-    menu_rect = menu_text.get_rect(center=(640, 250+70))  # Get the rectangle for the menu text and center it
+    menu_rect = menu_text.get_rect(center=(640, 250 + 70))  # Get the rectangle for the menu text and center it
     screen.blit(menu_text, menu_rect)  # Draw the menu text on the screen
 
     a = 400
     d = 70
 
     # Create buttons and draw them on the screen
-    btn_play_List = Button(screen, pos=(640, a+d), text='PLAYER LIST', font=default_font, base_color='gray', hov_color='white')
+    btn_play_List = Button(screen, pos=(640, a + d), text='PLAYER LIST', font=default_font, base_color='gray',
+                           hov_color='white')
 
-    btn_logout = Button(screen, pos=(256, a+d*4), text='LOG OUT', font=default_font2, base_color='gray', hov_color='white')
-    btn_quit = Button(screen, pos=(1100, a+d*4), text='QUIT', font=default_font2, base_color='gray', hov_color='white')
+    btn_logout = Button(screen, pos=(256, a + d * 4), text='LOG OUT', font=default_font2, base_color='gray',
+                        hov_color='white')
+    btn_quit = Button(screen, pos=(1100, a + d * 4), text='QUIT', font=default_font2, base_color='gray',
+                      hov_color='white')
 
     # Change button colors based on mouse position and draw them
     for btn in [btn_play_List, btn_logout, btn_quit]:
@@ -74,12 +78,15 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check which button is clicked and perform corresponding actions
             if btn_play_List.checkMousePos(mouse_pos):
-                
                 print(f"{btn_play_List.text_input} is pressed.")
+                subprocess.run([sys.executable, "Admin/Admin_player_list.py"])
+
                 ### ****************** Show player Listfunction ******************
 
             if btn_logout.checkMousePos(mouse_pos):
                 print(f"{btn_logout.text_input} is pressed.")
+                pygame.quit()
+
                 ### ******************* log_out_function ******************
 
             if btn_quit.checkMousePos(mouse_pos):

@@ -1,4 +1,13 @@
 import pygame
+import subprocess
+import sys
+import sqlite3
+
+conn = sqlite3.connect('userdata.db')
+cur = conn.cursor()
+
+# ##############################initial_setup###################
+
 
 class Button:
     def __init__(self, screen, pos, text, font, base_color, hov_color):
@@ -36,7 +45,17 @@ pygame.display.set_caption("Player List")  # Set the window caption
 menu_font = pygame.font.Font('Cartoon.ttf', 100)
 default_font = pygame.font.Font('Cartoon.ttf', 50)
 default_font2 = pygame.font.Font('Cartoon.ttf', 28)
-
+# Set up the scroll position and step size
+scroll_y = 0
+scroll_step = 15
+# Set up the initial button position
+a = 400
+d = 70
+# Set up the list position
+list_x = 355
+list_y = 200
+item_width = 200
+item_height = 60
 while True:
     screen.fill('black')  # Clear the screen with black color
     mouse_pos = pygame.mouse.get_pos()
@@ -45,45 +64,25 @@ while True:
     menu_rect = menu_text.get_rect(center=(640, 100))  # Get the rectangle for the menu text and center it
     screen.blit(menu_text, menu_rect)  # Draw the menu text on the screen
 
+    cur.execute("SELECT * FROM userdata where id != 0")
+    rows = cur.fetchall()
 
 
-    import openpyxl
 
-    # Load the workbook
-    workbook = openpyxl.load_workbook('/Users/wanpuichoi/Library/Mobile Documents/com~apple~CloudDocs/Year3/Sem2/CSCI3100/project/GOMOKU/player_list.xlsx')
+    # Render and display the list items
+    for i, row in enumerate(rows):
+        item_y = list_y + i * item_height + scroll_y
+        if list_y <= item_y < (a + 4*d):
+            item_text1 = default_font2.render(str(row[0]), True,'white')  # Assuming the second column contains the desired data
+            screen.blit(item_text1, (list_x + item_width * 0, item_y))
+            item_text2 = default_font2.render(row[1], True, 'white')
+            screen.blit(item_text2, (list_x + item_width * 1, item_y))
+            item_text3 = default_font2.render(row[2], True, 'white')
+            screen.blit(item_text3, (list_x + item_width * 2, item_y))
+            item_text4 = default_font2.render(str(row[3]), True, 'white')
+            screen.blit(item_text4, (list_x + item_width * 3, item_y))
 
-    # Select the active sheet
-    sheet = workbook.active
-
-    # Get the dimensions of the table
-    num_rows = sheet.max_row
-    num_cols = sheet.max_column
-
-    # Define the position and size of the table
-    table_x = 355
-    table_y = 200
-    cell_width = 150
-    cell_height = 30
-
-    # Loop through the table data and draw each cell
-    for row in range(1, num_rows + 1):
-        for col in range(1, num_cols + 1):
-            cell_value = sheet.cell(row=row, column=col).value
-            cell_x = table_x + (col - 1) * cell_width
-            cell_y = table_y + (row - 1) * cell_height
- 
-            cell_rect = pygame.Rect(cell_x, cell_y, cell_width, cell_height)
-
-            pygame.draw.rect(screen, 'black', cell_rect)
-            cell_text = default_font2.render(str(cell_value), True, 'white')
-            cell_text_rect = cell_text.get_rect(center=cell_rect.center)
-            screen.blit(cell_text, cell_text_rect)
-
-    # Save the changes to the workbook
-    workbook.save('/Users/wanpuichoi/Library/Mobile Documents/com~apple~CloudDocs/Year3/Sem2/CSCI3100/project/GOMOKU/player_list.xlsx')
-
-    a = 400
-    d = 70
+        #pygame.display.flip()
 
     # Create buttons and draw them on the screen
     btn_edit = Button(screen, pos=(256, a+d*4), text='EDIT', font=default_font, base_color='gray', hov_color='white')
@@ -100,13 +99,19 @@ while True:
         if event.type == pygame.QUIT:  # If the user closes the window, quit the game
             pygame.quit()
         if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 4:  # Scroll up
+                scroll_y += scroll_step
+            elif event.button == 5:  # Scroll down
+                scroll_y -= scroll_step
             # Check which button is clicked and perform corresponding actions
             if btn_edit.checkMousePos(mouse_pos):
-                
+                subprocess.run([sys.executable, "Admin/Admin_edit page.py"])
                 print(f"{btn_edit.text_input} is pressed.")
 
             if btn_back.checkMousePos(mouse_pos):
                 print(f"{btn_back.text_input} is pressed.")
+                #subprocess.run([sys.executable, "Admin_main.py"])
                 pygame.quit()
 
    
